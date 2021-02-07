@@ -1,4 +1,6 @@
 const $ = require("jquery");
+const dialog = require("electron").remote.dialog
+const fs  = require("fs");
 
 $(function () {
   let db;
@@ -8,6 +10,33 @@ $(function () {
   let sheetsDB = [];
   // console.log("document is loaded !!!");
   // cell pe lagao click event and run function
+  $(".new"). on("click" , function(){
+
+  })
+  $(".open").on("click"  ,function(){
+   let paths = dialog.showOpenDialog();
+   console.log(paths);
+   if(paths){
+     let path = paths[0];
+     clearUI();
+     $(".sheets-list").html("");
+
+     let openedSheetsDB = JSON.parse(fs.readFileSync(path));
+     console.log(openedSheetsDB);
+     sheetsDB = openedSheetsDB;
+     db= sheetsDB[0].db;
+     currentVisitedCells=sheetsDB[0].visitedCells;
+     sheetsId=0;
+
+     for(let i = 0;i<sheetsDB.length ;i++){
+       addSheetToSheetList();
+     }
+     setUI;
+     }
+  })
+  $(".save").on("click" ,function(){
+
+  })
 
   $(".cell").on("click", function () {
     console.log("cell clicked !!!!");
