@@ -1,3 +1,4 @@
+
 let { mongoose } = require("./db");
 
 
@@ -10,7 +11,10 @@ let followerSchema = mongoose.Schema({
         type:String,
         required:true
     }
-})
+});
+
+
+
 
 
 let followerModel = mongoose.model('follower' , followerSchema);

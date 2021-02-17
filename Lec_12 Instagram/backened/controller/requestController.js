@@ -20,25 +20,73 @@ async function sendRequest(req, res) {
         followerId: uid,
       });
       res.json({
-          message:"Request sent and accepted !!"
+        message: "Request sent and accepted !!"
       })
     } else {
       // isPublic = false
       await followingModel.create({
         uid,
         followId,
-        isAccepted:false
+        isAccepted: false
       });
       res.json({
-        message:"Request sent and pending !!"
-    })
+        message: "Request sent and pending !!"
+      })
     }
   } catch (error) {
+    res.json({
+      message: "Failed to send request !!",
+      error
+    })
+  }
+}
+async function acceptRequest(req , res){
+    try{
+        let {uid , toBeAccepted} = req.body;
+        // change in following document
+        let doc = await followingModel.find({uid:toBeAccepted , followId:uid}).exec();
+        console.log(doc);
+        doc[0].isAccepted = true;
+        await doc[0].save();
+        await followerModel.create({
+            uid ,
+            followerId: toBeAccepted ,
+        });
+        res.json({
+            message:"Request Accepted !"
+        })
+        // add in follower collection
+    }
+    catch(error){
+        res.json({
+            message:"Failed to accept request !!",
+            error
+        })
+    }
+}async function acceptRequest(req , res){
+  try{
+      let {uid , toBeAccepted} = req.body;
+      // change in following document
+      let doc = await followingModel.find({uid:toBeAccepted , followId:uid}).exec();
+      console.log(doc);
+      doc[0].isAccepted = true;
+      await doc[0].save();
+      await followerModel.create({
+          uid ,
+          followerId: toBeAccepted ,
+      });
       res.json({
-          message:"Failed to send request !!",
+          message:"Request Accepted !"
+      })
+      // add in follower collection
+  }
+  catch(error){
+      res.json({
+          message:"Failed to accept request !!",
           error
       })
   }
 }
 
 module.exports.sendRequest = sendRequest;
+module.exports.acceptRequest = acceptRequest;
