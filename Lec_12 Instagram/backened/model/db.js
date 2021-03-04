@@ -1,3 +1,5 @@
+//import moongose 
+
 const mongoose = require("mongoose");
 const { DB_CONFIG } = require("../config/secrets");
 
