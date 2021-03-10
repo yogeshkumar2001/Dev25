@@ -1,7 +1,7 @@
 const postRouter = require("express").Router();
 const multer  = require("multer");
 const path = require("path");
- const {createPost , getAllposts} = require("../controller/postController")
+ const {createPost , getAllposts , getMyPosts} = require("../controller/postController")
 
  var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -23,6 +23,8 @@ const path = require("path");
 
 
 postRouter.route("").get(getAllposts).post(upload.single('post') , createPost);
+postRouter.route("/:uid").get(getMyPosts);
+
 
 
 module.exports = postRouter;

@@ -69,7 +69,7 @@ class Settings extends Component {
           let profilePic = obj.data.updatedUser.profilePic;
           this.props.updateUser(obj.data.updatedUser);
           this.setState({
-              profilePic
+              profilePic,
           })
       });
   }

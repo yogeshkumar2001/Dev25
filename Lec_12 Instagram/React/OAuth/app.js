@@ -1,47 +1,42 @@
 
-// npm init -y
-// npm i express nodemon mongoose
+// npm i express nodemon passport passport-google-oauth2 cookie-session
 const express = require("express");
-const requestRouter = require("./router/requestRouter");
-const userRouter = require("./router/userRouter");
-const postRouter = require("./router/postRouter");
-const authRouter = require("./router/authRouter");
-const userModel = require("./model/userModel")
 const app = express();
-
-const cookie = require("cookie-session");
 const passport = require("passport");
 let GoogleStrategy = require("passport-google-oauth2").Strategy;
 let { CLIENT_ID, CLIENT_PW } = require("./config/secrets");
-const { authenticate } = require("passport");
+let cookie = require("cookie-session");
 
 
+
+// db import
+let { mongoose } = require("../../backened/model/db");
+let userModel = require("../../backened/model/userModel"); // {name , username , bio , email , pw };
+
+// to use public folder
 app.use(express.static("public"));
-
-
-// dumps post data into req.body
-app.use(express.json());
-
 app.use(cookie({
-  maxAge: 24 * 24 * 100,
-  keys: ["ajksfhkajbfkjabu"]  // userInfo + keys => id cookie save hoti hai => cookie id + keys => userInfo
+    maxAge : 24*24*100 ,
+    keys : ["ajksfhkajbfkjabu"]
 }))
-
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.serializeUser(function (user, done) {
-  console.log("Inside serialize user !!!");
-  console.log(user);
-  done(null, user);
+
+// serialize
+passport.serializeUser( function(user , done){
+    console.log("Inside serialize user !!!");
+    console.log(user);
+    done(null , user);
 });
 
 // deserialize
-passport.deserializeUser(function (user, done) {
-  console.log("Inside deserialize user !!");
-  done(null, user);
+passport.deserializeUser(function(user , done){
+    console.log("Inside deserialize user !!");
+    done(null , user);
 })
+
 
 // setup passport
 passport.use(
@@ -49,7 +44,7 @@ passport.use(
     {
       clientID: CLIENT_ID,
       clientSecret: CLIENT_PW,
-      callbackURL: "http://localhost:4000/auth/callback",
+      callbackURL: "http://localhost:3000/auth/callback",
       passReqToCallback: true,
     },
     async function (request, accessToken, refreshToken, profile, done) {
@@ -84,26 +79,32 @@ passport.use(
   )
 );
 
+// for login with oAuth
+app.get(
+  "/auth/google",
+  passport.authenticate("google", { scope: ["email", "profile"] }),
+  function (req, res) {
+    //   res.send("LOGGED IN !!!!");
+  }
+);
 
+// for oAuth callback
+app.get("/auth/callback", passport.authenticate("google"), function (req, res) {
+    res.redirect("/");
+});
 
-
-// for all the user related functions navigate to userRouter;
-//localhost:3000/api/user post method
-app.use("/api/user", userRouter);
-
-
-
-// for all the post related functions 
-app.use("/api/post", postRouter);
-
-
-// for all the functions
-// localhost:3000/api/request
-app.use("/api/request", requestRouter);
-
-
-app.use("/auth", authRouter);
-
-app.listen(4000, function () {
-  console.log("server started at port 4000 !!");
+// check Auth
+app.get("/checkAuth" , function(req , res){
+    if(req.user){
+        res.send("LOGGED IN WELCOME" + JSON.stringify(req.user));
+    }
+    else{
+        res.send("YOU ARE NOT LOGGED IN");
+    }
 })
+
+
+
+app.listen(3000, function () {
+  console.log("Server started at port 3000 !!!");
+});

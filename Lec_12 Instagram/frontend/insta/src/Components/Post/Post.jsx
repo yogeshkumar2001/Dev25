@@ -5,12 +5,12 @@ import "./Post.css";
 
 class Post extends Component {
   state = {
-    userPhoto:"",    
-    username:"",
-    caption:"",
-    postImage:"",
-    comments:[],
-    likes:[],
+    userPhoto: "",
+    name: "",
+    caption: "",
+    postImage: "",
+    comments: [],
+    likes: [],
   };
 
   // __v:0
@@ -22,37 +22,51 @@ class Post extends Component {
   // postImage:"/images/posts/1614180783760.png"
   // uid:"601f7203fbe1d84480f5ac3f"
 
-  componentDidMount(){
-    let postUserUid = this.props.post.uid;
-    let post = this.props.post;
-    axios.get(`/api/user/${postUserUid}`).then( obj =>{
-      let postUser = obj.data.user;
+  componentDidMount() {
+    if (this.props.user) {
       this.setState({
-        userPhoto : postUser.profilePic ,
-        username : postUser.username ,
-        caption : post.caption,
-        postImage : post.postImage,
-        comments : post.comments ,
-        likes :  post.likes
-      })    
-    })
+        userPhoto: this.props.user.profilePic,
+        name: this.props.user.name,
+        caption: this.props.post.caption,
+        postImage: this.props.post.postImage,
+        comments: this.props.post.comments,
+        likes: this.props.post.likes,
+
+      });
+    }
+    else {
+
+      let postUserUid = this.props.post.uid;
+      let post = this.props.post;
+      axios.get(`/api/user/${postUserUid}`).then(obj => {
+        let postUser = obj.data.user;
+        this.setState({
+          userPhoto: postUser.profilePic,
+          name: postUser.name,
+          caption: post.caption,
+          postImage: post.postImage,
+          comments: post.comments,
+          likes: post.likes
+        })
+      })
+    }
   }
 
   render() {
-    let {userPhoto , username , caption , postImage , comments , likes} = this.state;
+    let { userPhoto, name, caption, postImage, comments, likes } = this.state;
     return (
       <div className="post">
         <div className="post-header">
           <div className="post-userphoto">
-            <img src={userPhoto} alt="user.png"/>
+            <img src={userPhoto} alt="user.png" />
           </div>
           <div className="post-username">
-            {username}
+            {name}
           </div>
         </div>
         <div className="post-body">
           <div className="postImage">
-            <img src={postImage} alt=""/>
+            <img src={postImage} alt="" />
           </div>
           <div className="post-actions">
             <div className="like">Like</div>
@@ -60,14 +74,14 @@ class Post extends Component {
           </div>
           <div className="likes-count">1231 likes</div>
           <div className="post-details">
-            <div className="post-username"> {username} </div>
+            <div className="post-username"> {name} </div>
             <div className="post-caption">{caption}</div>
           </div>
           <div className="post-comments">
             Comments
           </div>
           <div className="post-comment-box">
-            <input type="text" name="" className="comment" placeholder="Add a comment..."/>
+            <input type="text" name="" className="comment" placeholder="Add a comment..." />
             <div className="post-comment-btn">POST</div>
           </div>
         </div>
